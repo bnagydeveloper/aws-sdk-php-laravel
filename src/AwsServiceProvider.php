@@ -10,7 +10,7 @@ use Laravel\Lumen\Application as LumenApplication;
  */
 class AwsServiceProvider extends ServiceProvider
 {
-    const VERSION = '3.4.0';
+    const VERSION = '1.3';
 
     /**
      * Indicates if loading of the provider is deferred.
@@ -26,14 +26,7 @@ class AwsServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if ($this->app instanceof LaravelApplication && $this->app->runningInConsole()) {
-            $this->publishes(
-                [__DIR__.'/../config/aws_publish.php' => config_path('aws.php')],
-                'aws-config'
-            );
-        } elseif ($this->app instanceof LumenApplication) {
-            $this->app->configure('aws');
-        }
+        $this->app['config']->package('aws/aws-sdk-php-laravel', __DIR__.'/../config', 'aws');
     }
 
     /**
@@ -43,11 +36,6 @@ class AwsServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom(
-            __DIR__.'/../config/aws_default.php',
-            'aws'
-        );
-
         $this->app->singleton('aws', function ($app) {
             $config = $app->make('config')->get('aws');
 
